@@ -1,75 +1,88 @@
 //Variables Init
 score = 0;
 question_counter = 1;
-var counter = 25;
+counter = 25;
 ans = 0;
-uid = -1;
+uid = 0;
 
-	//Question Details
-	qid = "";
-	question = "";
-	opt1 = "";
-	opt2 = "";
-	opt3 = "";
-	opt4 = "";
-	level = "";
-	correct = "";
+//Question Details
+qid = "";
+question = "";
+opt1 = "";
+opt2 = "";
+opt3 = "";
+opt4 = "";
+level = "";
+correct = "";
+
+/* BEGIN GLOBAL FUNCTIONS DECLARATION */
+
+//Update Database
+function updateDB(qid, uid, score, time, ans){
+	var data = "qid=" + qid + "&uid=" + uid + "&score=" + score + "&time=" + (25-time) + "&ans=" + ans;
+	console.log(data);
+	$.ajax({
+		url: "db_enter.php",
+		data: data
+	}).done(function() {
+		$("#alert").width("10%");
+		$("#alert").html("QUESTION " + qid + " ANSWERED.");
+		$("#alert").removeAttr("hidden");
+	});
+}
+
+//Get Question
+function retrieveDB(qid){
+	console.log("RETRIEVING");
+	var data = "qid="+qid;
+	$.ajax({
+		url: "db_retrieve.php",
+		data: data,
+		dataType:"json"
+	}).done(function(msg) {
+		qid = msg[0].qid;
+		question = msg[0].question;
+		opt1 = msg[0].option1;
+		opt2 = msg[0].option2;
+		opt3 = msg[0].option3;
+		opt4 = msg[0].option4;
+		level = msg[0].level;
+		correct = msg[0].correct;
+	});
+}
+
+//Set UI for new question
+function setUI(){
+	$("#q_header").html("Question " + qid);
+	$("#q_body").html(question);
+	$("#1").html("<em class=\"glyphicon glyphicon-ok\"></em>" + opt1);
+	$("#2").html("<em class=\"glyphicon glyphicon-ok\"></em>" + opt2);
+	$("#3").html("<em class=\"glyphicon glyphicon-ok\"></em>" + opt3);
+	$("#4").html("<em class=\"glyphicon glyphicon-ok\"></em>" + opt4);
+	$("#level").html("Level " + level);
+}
+
+/* END FUNCTION DECLARATIONS */
 
 
-	function updateDB(qid, uid, score, time, ans){
-		var data = "qid=" + qid + "&uid=" + uid + "&score=" + score + "&time=" + (25-time) + "&ans=" + ans;
-		console.log(data);
-		$.ajax({
-			url: "db_enter.php",
-			data: data
-		}).done(function() {
-			$("#alert").width("10%");
-			$("#alert").html("QUESTION " + qid + " ANSWERED.");
-			$("#alert").removeAttr("hidden");
-		});
-	}
-
-	function retrieveDB(qid){
-		console.log("RETRIEVING");
-		var data = "qid="+qid;
-		$.ajax({
-			url: "db_retrieve.php",
-			data: data,
-			dataType:"json"
-		}).done(function(msg) {
-			qid = msg[0].qid;
-			question = msg[0].question;
-			opt1 = msg[0].option1;
-			opt2 = msg[0].option2;
-			opt3 = msg[0].option3;
-			opt4 = msg[0].option4;
-			level = msg[0].level;
-			correct = msg[0].correct;
-		});
-	}
-
-	function setUI(){
-		$("#q_header").html("Question " + qid);
-		$("#q_body").html(question);
-		$("#1").html(opt1);
-		$("#2").html(opt2);
-		$("#3").html(opt3);
-		$("#4").html(opt4);
-	}
-
-	$(document).ready(function(){
+$(document).ready(function(){
+		//User ID input
 		$('#login').modal("show");
 
+		//Prepare First Question
+		retrieveDB(1);
+
+		//Get user ID
 		$("#login").on('shown.bs.modal', function(){
 			$("#save_uid").click(function(){
 				uid = $("#unum").val();
-				retrieveDB(question_counter);	
 				$('#login').modal("hide");
 			});
 		});
 
 		$("#login").on('hidden.bs.modal', function(){
 			setUI();
+
 			var interval = setInterval(function() {
 				counter--;
 				$("#timer").attr("style","width: "+ ((counter/25)*100) +"%;");
@@ -89,7 +102,6 @@ uid = -1;
 					score = score + 0;
 					updateDB(question_counter, uid, score, counter, ans);
 					question_counter++;
-					$("#q_header").html("Question " + question_counter);
 					retrieveDB(question_counter);
 					setUI();
 					counter = 25;
