@@ -6,7 +6,7 @@ ans = 0;
 uid = -1;
 
 	//Question Details
-	qid = 0;
+	qid = "";
 	question = "";
 	opt1 = "";
 	opt2 = "";
@@ -47,20 +47,29 @@ uid = -1;
 			correct = msg[0].correct;
 		});
 	}
+
+	function setUI(){
+		$("#q_header").html("Question " + qid);
+		$("#q_body").html(question);
+		$("#1").html(opt1);
+		$("#2").html(opt2);
+		$("#3").html(opt3);
+		$("#4").html(opt4);
+	}
+
 	$(document).ready(function(){
 		$('#login').modal("show");
 
 		$("#login").on('shown.bs.modal', function(){
 			$("#save_uid").click(function(){
 				uid = $("#unum").val();
-				retrieveDB(question_counter);
-				$("#q_header").html("Question " + qid);
-				$("#q_body").html(question);
+				retrieveDB(question_counter);	
 				$('#login').modal("hide");
 			});
 		});
 
 		$("#login").on('hidden.bs.modal', function(){
+			setUI();
 			var interval = setInterval(function() {
 				counter--;
 				$("#timer").attr("style","width: "+ ((counter/25)*100) +"%;");
@@ -82,7 +91,7 @@ uid = -1;
 					question_counter++;
 					$("#q_header").html("Question " + question_counter);
 					retrieveDB(question_counter);
-					$("#q_body").html(question);
+					setUI();
 					counter = 25;
 				}
 			}, 1000);
@@ -102,6 +111,7 @@ uid = -1;
 				$("#q_header").html("Question " + question_counter);
 				retrieveDB(question_counter);
 				$(".btn").prop("disabled", false);
+				setUI();
 			});
 
 			function beep() {
