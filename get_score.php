@@ -18,9 +18,14 @@ $conn = mysqli_connect($db_host, $db_user, $db_pass, $db_name) or die("ERROR");
 $uid = $_REQUEST['uid'];
 
 //QUERY
-$query = "SELECT MAX(score) FROM `qbit`.`results` WHERE uid=".$uid.";";
+$query = "SELECT MAX(score), MAX(qid) FROM `qbit`.`results` WHERE uid=".$uid.";";
+$json = array();
 $show=mysqli_query($conn,$query) or die ("Error");
 while($row=mysqli_fetch_array($show)){
-	echo $row[0];
+	$ques = array(
+		"score"=>$row[0],
+		"curr_question"=>$row[1]);
+	array_push($json,$ques);
 }
+echo json_encode($json);
 ?>

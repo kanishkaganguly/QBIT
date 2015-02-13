@@ -5,8 +5,6 @@ counter = 25;
 ans = 0;
 uid = 0;
 correct=0;
-//Question Details
-
 
 /* BEGIN GLOBAL FUNCTIONS DECLARATION */
 
@@ -119,8 +117,12 @@ $(document).ready(function(){
 				$(".btn").prop("disabled", true);
 				ans = this.id;
 				if(ans == correct){
+					$("#ans_alert").attr("class", "alert alert-success");
+					$("#ans_alert").html("CORRECT ANSWER.");
 					score = score + counter;
 				}else{
+					$("#ans_alert").attr("class", "alert alert-danger");
+					$("#ans_alert").html("WRONG ANSWER.");
 					score = score + 0;
 				}
 				updateDB(question_counter, uid, score, counter, ans);
