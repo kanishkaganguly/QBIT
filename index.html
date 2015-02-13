@@ -97,10 +97,26 @@
 				</div>
 				<div class="modal-body">
 					<label for="unum">Enter User ID</label>
-					<input type="text" id="unum" name="unum">
+					<input type="number" id="unum" name="unum" placeholder="Input Your Team Number" required/>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary" id="save_uid">Start Quiz</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	<div class="modal fade" id="finish">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title">Thank You For Participating!</h4>
+				</div>
+				<div class="modal-body">
+					<h3>Your Score IS: <span id="finscore"></span></h3>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" id="save_uid">Finish</button>
 				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->

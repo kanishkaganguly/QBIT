@@ -4,16 +4,9 @@ question_counter = 1;
 counter = 25;
 ans = 0;
 uid = 0;
-
+correct=0;
 //Question Details
-qid = "";
-question = "";
-opt1 = "";
-opt2 = "";
-opt3 = "";
-opt4 = "";
-level = "";
-correct = "";
+
 
 /* BEGIN GLOBAL FUNCTIONS DECLARATION */
 
@@ -32,14 +25,15 @@ function updateDB(qid, uid, score, time, ans){
 }
 
 //Get Question
-function retrieveDB(qid){
+function retrieveDB(qcount){
 	console.log("RETRIEVING");
-	var data = "qid="+qid;
+	var data = "qid="+qcount;
 	$.ajax({
 		url: "db_retrieve.php",
 		data: data,
 		dataType:"json"
 	}).done(function(msg) {
+		console.log(msg[0].qid);
 		qid = msg[0].qid;
 		question = msg[0].question;
 		opt1 = msg[0].option1;
@@ -52,14 +46,23 @@ function retrieveDB(qid){
 }
 
 //Set UI for new question
-function setUI(){
-	$("#q_header").html("Question " + qid);
-	$("#q_body").html(question);
-	$("#1").html("<em class=\"glyphicon glyphicon-ok\"></em>" + opt1);
-	$("#2").html("<em class=\"glyphicon glyphicon-ok\"></em>" + opt2);
-	$("#3").html("<em class=\"glyphicon glyphicon-ok\"></em>" + opt3);
-	$("#4").html("<em class=\"glyphicon glyphicon-ok\"></em>" + opt4);
-	$("#level").html("Level " + level);
+function setUI(qcount){
+	var data = "qid="+qcount;
+	$.ajax({
+		url: "db_retrieve.php",
+		data: data,
+		dataType:"json"
+	}).done(function(msg) {
+		$("#q_header").html("Question " + msg[0].qid);
+		$("#q_body").html(msg[0].question);
+		$("#1").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option1);
+		$("#2").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option2);
+		$("#3").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option3);
+		$("#4").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option4);
+		$("#level").html("Level " + msg[0].level);
+		console.log(msg[0].qid);
+		correct = msg[0].correct;
+	});
 }
 
 /* END FUNCTION DECLARATIONS */
@@ -68,10 +71,9 @@ function setUI(){
 $(document).ready(function(){
 		//User ID input
 		$('#login').modal("show");
-
 		//Prepare First Question
-		retrieveDB(1);
-
+		//retrieveDB(question_counter);
+		console.log(question_counter);
 		//Get user ID
 		$("#login").on('shown.bs.modal', function(){
 			$("#save_uid").click(function(){
@@ -81,7 +83,7 @@ $(document).ready(function(){
 		});
 
 		$("#login").on('hidden.bs.modal', function(){
-			setUI();
+			setUI(question_counter);
 
 			var interval = setInterval(function() {
 				counter--;
@@ -101,10 +103,15 @@ $(document).ready(function(){
 					ans = 0;
 					score = score + 0;
 					updateDB(question_counter, uid, score, counter, ans);
-					question_counter++;
-					retrieveDB(question_counter);
-					setUI();
-					counter = 25;
+					question_counter=question_counter+1;
+					if(question_counter<26){
+						setUI(question_counter);
+						counter = 25;
+					}
+					else{
+						clearInterval(interval);
+						$('#finish').modal("show");
+					}
 				}
 			}, 1000);
 
@@ -118,12 +125,18 @@ $(document).ready(function(){
 				}
 				updateDB(question_counter, uid, score, counter, ans);
 				$("#scoreshow").html("CURRENT SCORE &nbsp;<b>" + score + "</b>")
-				counter = 25;
-				question_counter++;
-				$("#q_header").html("Question " + question_counter);
-				retrieveDB(question_counter);
+				question_counter=question_counter+1;
+				console.log("btn click: "+question_counter);
+				//retrieveDB(question_counter);
 				$(".btn").prop("disabled", false);
-				setUI();
+				if(question_counter<26){
+					setUI(question_counter);
+					counter = 25;
+				}else{
+					clearInterval(interval);
+					$('#finish').modal("show");
+					$('#finscore').html(score);
+				}
 			});
 
 			function beep() {
