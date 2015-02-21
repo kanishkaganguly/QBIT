@@ -11,7 +11,6 @@ correct=0;
 //Update Database
 function updateDB(qid, uid, score, time, ans){
 	var data = "qid=" + qid + "&uid=" + uid + "&score=" + score + "&time=" + (25-time) + "&ans=" + ans;
-	console.log(data);
 	$.ajax({
 		url: "db_enter.php",
 		data: data
@@ -24,14 +23,12 @@ function updateDB(qid, uid, score, time, ans){
 
 //Get Question
 function retrieveDB(qcount){
-	console.log("RETRIEVING");
 	var data = "qid="+qcount;
 	$.ajax({
 		url: "db_retrieve.php",
 		data: data,
 		dataType:"json"
 	}).done(function(msg) {
-		console.log(msg[0].qid);
 		qid = msg[0].qid;
 		question = msg[0].question;
 		opt1 = msg[0].option1;
@@ -45,22 +42,25 @@ function retrieveDB(qcount){
 
 //Set UI for new question
 function setUI(qcount){
-	var data = "qid="+qcount;
-	$.ajax({
-		url: "db_retrieve.php",
-		data: data,
-		dataType:"json"
-	}).done(function(msg) {
-		$("#q_header").html("Question " + msg[0].qid);
-		$("#q_body").html(msg[0].question);
-		$("#1").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option1);
-		$("#2").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option2);
-		$("#3").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option3);
-		$("#4").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option4);
-		$("#level").html("Level " + msg[0].level);
-		console.log(msg[0].qid);
-		correct = msg[0].correct;
-	});
+	setTimeout(function(){
+		$(".btn").attr("class", "btn btn-default");
+		$(".btn").attr("class", "btn btn-default");
+		var data = "qid="+qcount;
+		$.ajax({
+			url: "db_retrieve.php",
+			data: data,
+			dataType:"json"
+		}).done(function(msg) {
+			$("#q_header").html("Question " + msg[0].qid);
+			$("#q_body").html(msg[0].question);
+			$("#1").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option1);
+			$("#2").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option2);
+			$("#3").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option3);
+			$("#4").html("<em class=\"glyphicon glyphicon-ok\"></em>" + msg[0].option4);
+			$("#level").html("Level " + msg[0].level);
+			correct = msg[0].correct;
+		});
+	},500);
 }
 
 /* END FUNCTION DECLARATIONS */
@@ -71,7 +71,6 @@ $(document).ready(function(){
 		$('#login').modal("show");
 		//Prepare First Question
 		//retrieveDB(question_counter);
-		console.log(question_counter);
 		//Get user ID
 		$("#login").on('shown.bs.modal', function(){
 			$("#save_uid").click(function(){
@@ -117,18 +116,17 @@ $(document).ready(function(){
 				$(".btn").prop("disabled", true);
 				ans = this.id;
 				if(ans == correct){
-					$("#ans_alert").attr("class", "alert alert-success");
-					$("#ans_alert").html("CORRECT ANSWER.");
+					$("#" + ans).attr("class", "btn btn-success");
+					//$("#ans_alert").html("CORRECT ANSWER.");
 					score = score + counter;
 				}else{
-					$("#ans_alert").attr("class", "alert alert-danger");
-					$("#ans_alert").html("WRONG ANSWER.");
+					$("#" + ans).attr("class", "btn btn-danger");
+					//$("#ans_alert").html("WRONG ANSWER.");
 					score = score + 0;
 				}
 				updateDB(question_counter, uid, score, counter, ans);
 				$("#scoreshow").html("CURRENT SCORE &nbsp;<b>" + score + "</b>")
 				question_counter=question_counter+1;
-				console.log("btn click: "+question_counter);
 				//retrieveDB(question_counter);
 				$(".btn").prop("disabled", false);
 				if(question_counter<26){
